@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>夏娅文 · AI Agent 开发者作品集</title>
+<meta name="description" content="夏娅文，AI 应用开发 / AI Agent / Vibe Coding 开发者，物联网工程背景，展示工业视觉检测、AI 粒子交互、像素闯关游戏、智能监控与温湿度采集作品。">
+<link rel="preconnect" href="https://miaoda.feishu.cn">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap">
+<style>
+  :root{
+    --mint:#B6EFC4;
+    --mint-deep:#7FD4A0;
+    --mint-dark:#4FB881;
+    --cream-green:#EAFFD5;
+    --pale-green:#DCFAE2;
+    --aqua:#9AD6DD;
+    --aqua-deep:#6FC0CA;
+    --bg:#F7FFF0;
+    --ink:#2C4A3E;
+    --ink-deep:#1E3A2E;
+    --card:#FFFFFF;
+    --gray:#5A7A6B;
+    --gray-light:#8AA89A;
+    --line:#D4EED8;
+    --shadow:0 14px 34px rgba(44,74,62,.10);
+    --radius:18px;
+    --font:'Noto Sans SC','Microsoft YaHei',system-ui,-apple-system,'Segoe UI',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--font);
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.7;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--mint);color:var(--ink-deep)}
+
+  /* ===== 粒子背景 ===== */
+  #fx{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+  /* ===== 顶部导航 ===== */
+  .nav{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:14px 6vw;
+    background:rgba(247,255,240,.85);
+    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{font-weight:900;font-size:17px;letter-spacing:.02em;color:var(--ink-deep);display:flex;align-items:center;gap:9px}
+  .brand .dot{width:11px;height:11px;border-radius:50%;background:var(--mint-deep);box-shadow:0 0 0 4px rgba(127,212,160,.28)}
+  .nav-links{display:flex;align-items:center;gap:4px}
+  .nav-links a{text-decoration:none;color:var(--gray);font-size:14px;font-weight:500;padding:8px 13px;border-radius:10px;transition:color .2s,background .2s}
+  .nav-links a:hover{color:var(--ink-deep);background:var(--pale-green)}
+  .sound-btn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-family:var(--font);font-size:13px;font-weight:500;padding:8px 13px;border-radius:999px;cursor:pointer;transition:transform .15s,box-shadow .2s}
+  .sound-btn:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+  .sound-btn svg{width:15px;height:15px;stroke:var(--ink)}
+
+  /* ===== Hero ===== */
+  .hero{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:110px 6vw 70px;max-width:1180px;margin:0 auto}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;color:var(--mint-dark);font-weight:700;font-size:13px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:22px}
+  .eyebrow::before{content:"";width:34px;height:2px;background:var(--mint-deep)}
+  .hero h1{font-size:clamp(46px,8vw,86px);font-weight:900;letter-spacing:-.01em;line-height:1.08;color:var(--ink-deep)}
+  .hero h1 .accent{color:var(--ink-deep);position:relative}
+  .hero h1 .accent::after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:.16em;background:var(--mint);z-index:-1;border-radius:2px}
+  .typer{margin-top:20px;font-size:clamp(20px,3.4vw,30px);font-weight:500;color:var(--gray);min-height:1.7em}
+  .typer .cursor{display:inline-block;width:3px;height:1.05em;background:var(--mint-dark);margin-left:3px;vertical-align:-.15em;animation:blink .9s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .hero .lead{margin-top:26px;max-width:640px;font-size:16.5px;color:var(--gray)}
+  .hero .lead strong{color:var(--ink-deep)}
+  .hero-cta{margin-top:38px;display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:14px 26px;border-radius:14px;font-family:var(--font);font-size:15px;font-weight:700;text-decoration:none;cursor:pointer;border:none;transition:transform .16s,box-shadow .2s,background .2s;min-height:48px}
+  .btn-primary{background:var(--mint-deep);color:var(--ink-deep)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(127,212,160,.45)}
+  .btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+  .btn-ghost:hover{background:var(--pale-green);transform:translateY(-2px)}
+  .btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2}
+  .hero-meta{margin-top:52px;display:flex;flex-wrap:wrap;gap:12px}
+  .chip{display:inline-flex;align-items:center;gap:7px;padding:8px 15px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--gray);font-size:13px;font-weight:500;text-decoration:none}
+  .chip svg{width:14px;height:14px;stroke:var(--mint-dark)}
+
+  /* ===== 通用 section ===== */
+  section{position:relative;z-index:1}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 6vw}
+  .sec-head{margin-bottom:44px}
+  .sec-tag{display:inline-flex;align-items:center;gap:8px;color:var(--mint-dark);font-weight:700;font-size:13px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:14px}
+  .sec-tag::before{content:"";width:28px;height:2px;background:var(--mint-deep)}
+  .sec-head h2{font-size:clamp(28px,4.6vw,42px);font-weight:900;color:var(--ink-deep);letter-spacing:-.01em}
+  .sec-head p{color:var(--gray);margin-top:10px;max-width:640px;font-size:15.5px}
+
+  /* ===== 作品 ===== */
+  .works{background:linear-gradient(180deg,var(--bg) 0%,var(--cream-green) 100%);padding:96px 0}
+  .work-grid{display:grid;grid-template-columns:1fr;gap:34px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:0 4px 16px rgba(44,74,62,.05);transition:transform .28s,box-shadow .28s;display:grid;grid-template-columns:1.05fr 1fr;align-items:stretch}
+  .card:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
+  .card-media{position:relative;min-height:300px;background:var(--ink-deep);display:flex;align-items:center;justify-content:center}
+  .card-media iframe{position:absolute;inset:0;width:100%;height:100%;border:none;display:block}
+  .card-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+  .card-media .tag-row{position:absolute;left:16px;top:16px;z-index:3;display:flex;gap:8px;flex-wrap:wrap}
+  .tag{padding:5px 11px;border-radius:999px;background:var(--mint-deep);color:var(--ink-deep);font-size:12px;font-weight:700}
+  .tag.dark{background:rgba(30,58,46,.78);color:#fff;backdrop-filter:blur(6px)}
+  .tag.aqua{background:var(--aqua);color:var(--ink-deep)}
+  .card-body{padding:30px 30px 26px;display:flex;flex-direction:column}
+  .card-body h3{font-size:22px;font-weight:900;color:var(--ink-deep)}
+  .card-body .sub{color:var(--gray-light);font-size:13px;margin-top:4px;font-weight:500}
+  .card-body .desc{color:var(--gray);font-size:14.5px;margin-top:14px}
+  .card-body .skills{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .skill-mini{padding:4px 10px;border-radius:8px;background:var(--pale-green);color:var(--ink);font-size:12px;font-weight:600}
+  .card-body .links{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+  .link-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:10px;background:var(--ink-deep);color:#fff;font-size:13px;font-weight:600;text-decoration:none;transition:transform .15s,background .2s}
+  .link-btn:hover{transform:translateY(-1px);background:var(--ink)}
+  .link-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+  .link-btn.alt{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
+  .link-btn.alt:hover{background:var(--pale-green)}
+
+  /* ===== 相册（视觉检测） ===== */
+  .gallery{position:relative;width:100%;height:100%;min-height:300px;background:#0d1f17;display:flex;flex-direction:column}
+  .gallery-stage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:240px}
+  .gallery-stage img{max-width:100%;max-height:100%;object-fit:contain;display:block;transition:opacity .3s}
+  .gallery-nav{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.88);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:5;transition:background .2s,transform .15s;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+  .gallery-nav:hover{background:#fff;transform:translateY(-50%) scale(1.08)}
+  .gallery-nav svg{width:18px;height:18px;stroke:var(--ink-deep);fill:none;stroke-width:2.5}
+  .gallery-prev{left:12px}
+  .gallery-next{right:12px}
+  .gallery-caption{padding:12px 18px;background:rgba(30,58,46,.92);color:#EAFFD5;font-size:13px;font-weight:600;text-align:center;backdrop-filter:blur(6px)}
+  .gallery-caption .fname{color:var(--mint);font-size:11.5px;font-weight:500;display:block;margin-top:2px;opacity:.85}
+  .gallery-dots{display:flex;gap:6px;justify-content:center;padding:8px 0;background:rgba(30,58,46,.92)}
+  .gallery-dots button{width:8px;height:8px;border-radius:50%;border:none;background:rgba(255,255,255,.3);cursor:pointer;transition:background .2s,transform .15s;padding:0}
+  .gallery-dots button.active{background:var(--mint-deep);transform:scale(1.3)}
+  .gallery-hint{position:absolute;right:14px;top:14px;z-index:4;padding:5px 11px;border-radius:999px;background:rgba(30,58,46,.78);color:#EAFFD5;font-size:11.5px;font-weight:600;backdrop-filter:blur(6px)}
+
+  /* ===== 温湿度双图 ===== */
+  .dual-img{display:grid;grid-template-columns:1fr 1fr;gap:0;width:100%;height:100%;min-height:300px}
+  .dual-img figure{position:relative;overflow:hidden;background:var(--ink-deep);margin:0}
+  .dual-img img{width:100%;height:100%;object-fit:cover;display:block}
+  .dual-img figcaption{position:absolute;left:0;right:0;bottom:0;padding:8px 12px;background:linear-gradient(transparent,rgba(30,58,46,.88));color:#EAFFD5;font-size:12px;font-weight:600}
+
+  /* ===== 奖项 ===== */
+  .awards{padding:96px 0}
+  .award-block{margin-bottom:56px}
+  .award-block:last-child{margin-bottom:0}
+  .award-block h3{font-size:20px;font-weight:800;color:var(--ink-deep);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+  .award-block h3::before{content:"";width:6px;height:22px;background:var(--mint-deep);border-radius:3px}
+  .award-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:26px}
+  .award-grid.four{grid-template-columns:repeat(4,1fr)}
+  .award{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:0 4px 16px rgba(44,74,62,.05)}
+  .award img{width:100%;height:auto;display:block;border-bottom:1px solid var(--line)}
+  .award-info{padding:16px 20px}
+  .award-info h4{font-size:15px;font-weight:800;color:var(--ink-deep)}
+  .award-info p{font-size:12.5px;color:var(--gray);margin-top:3px}
+
+  /* ===== 技能 ===== */
+  .skills-sec{background:var(--ink-deep);padding:96px 0;color:#fff}
+  .skills-sec .sec-tag{color:var(--mint)}
+  .skills-sec .sec-tag::before{background:var(--mint)}
+  .skills-sec .sec-head h2{color:#fff}
+  .skills-sec .sec-head p{color:rgba(255,255,255,.72)}
+  .skill-list{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .skill-item{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:22px 22px 18px;transition:background .2s,transform .2s}
+  .skill-item:hover{background:rgba(182,239,196,.14);transform:translateY(-3px)}
+  .skill-item .s-icon{width:34px;height:34px;border-radius:9px;background:var(--mint);color:var(--ink-deep);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+  .skill-item .s-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.2}
+  .skill-item h4{font-size:15.5px;font-weight:800}
+  .skill-item p{font-size:13px;color:rgba(255,255,255,.7);margin-top:6px;line-height:1.6}
+
+  /* ===== Footer ===== */
+  footer{position:relative;z-index:1;background:var(--ink);color:#fff;padding:80px 0 46px}
+  .foot-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:40px;align-items:start}
+  footer h3{font-size:30px;font-weight:900}
+  footer .foot-sub{color:rgba(255,255,255,.6);margin-top:10px;font-size:15px}
+  .contact-list{display:flex;flex-direction:column;gap:14px;margin-top:26px}
+  .contact-row{display:flex;align-items:center;gap:12px;color:rgba(255,255,255,.82);text-decoration:none;font-size:14.5px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);transition:background .2s,transform .15s}
+  .contact-row:hover{background:rgba(182,239,196,.14);transform:translateX(3px)}
+  .contact-row svg{width:17px;height:17px;stroke:var(--mint);fill:none;stroke-width:2;flex:none}
+  .foot-note{margin-top:44px;padding-top:20px;border-top:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.4);font-size:12.5px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+  /* ===== 滚动渐显 ===== */
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  /* ===== 响应式 ===== */
+  @media (max-width:860px){
+    .card{grid-template-columns:1fr}
+    .card-media{min-height:240px}
+    .gallery{min-height:280px}
+    .dual-img{min-height:240px}
+    .skill-list{grid-template-columns:repeat(2,1fr)}
+    .award-grid{grid-template-columns:1fr}
+    .award-grid.four{grid-template-columns:repeat(2,1fr)}
+    .foot-grid{grid-template-columns:1fr}
+    .nav-links a{display:none}
+  }
+  @media (max-width:520px){
+    .skill-list{grid-template-columns:1fr}
+    .award-grid.four{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto}
+    .reveal{opacity:1;transform:none;transition:none}
+    *{animation-duration:.01ms !important;animation-iteration-count:1 !important}
+  }
+</style>
+</head>
+<body>
+
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<header class="nav">
+  <div class="brand"><span class="dot"></span>夏娅文</div>
+  <nav class="nav-links" aria-label="页面导航">
+    <a href="#works">作品</a>
+    <a href="#awards">奖项</a>
+    <a href="#skills">技能</a>
+    <a href="#contact">联系</a>
+    <button class="sound-btn" id="soundBtn" aria-pressed="true" title="音效开关">
+      <svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+      <span id="soundLabel">音效开</span>
+    </button>
+  </nav>
+</header>
+
+<section class="hero" id="top">
+  <span class="eyebrow">AI 应用开发 · AI Agent · Vibe Coding</span>
+  <h1>你好，我是<span class="accent">夏娅文</span></h1>
+  <div class="typer"><span id="typeText"></span><span class="cursor" aria-hidden="true"></span></div>
+  <p class="lead">物联网工程本科在读，专注 <strong>AI 应用开发</strong> 与 <strong>AI Agent / Vibe Coding</strong> 方向。习惯用 <strong>Cline / Codex</strong> 与 AI 协作开发，两个前端作品均由 AI Agent 辅助完成。同时也掌握 TypeScript、Python、Web 前端与嵌入式基础。</p>
+  <div class="hero-cta">
+    <a class="btn btn-primary" href="#works"><svg viewBox="0 0 24 24"><path d="M7 4h10v16l-5-3-5 3V4z"/></svg>查看作品</a>
+    <a class="btn btn-ghost" href="#contact"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M4 7l8 6 8-6"/></svg>联系我</a>
+  </div>
+  <div class="hero-meta">
+    <a class="chip" href="tel:13007221185"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>130 0722 1185</a>
+    <a class="chip" href="mailto:80622296@qq.com"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M4 7l8 6 8-6"/></svg>80622296@qq.com</a>
+    <a class="chip" href="https://github.com/AsaiShiio" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.1-1.1-1.4-1.1-1.4-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg>github.com/AsaiShiio</a>
+  </div>
+</section>
+
+<section class="works" id="works">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-tag">Portfolio</span>
+      <h2>我的作品</h2>
+      <p>涵盖工业视觉检测、AI 交互、游戏开发、智能监控与物联网采集。前两个前端项目均使用 AI Agent（Cline / Codex）协作开发。</p>
+    </div>
+
+    <div class="work-grid">
+
+      <!-- 作品 1：工业视觉智能检测（相册，放首位） -->
+      <article class="card reveal">
+        <div class="card-media" style="padding:0">
+          <div class="tag-row"><span class="tag">AIC 2025 国赛二等奖</span><span class="tag dark">97.5% 准确率</span></div>
+          <span class="gallery-hint">← → 键切换 / 共 7 张</span>
+          <div class="gallery" id="visionGallery">
+            <div class="gallery-stage">
+              <button class="gallery-nav gallery-prev" id="gPrev" aria-label="上一张"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+              <img id="gImg" src="https://aka.doubaocdn.com/s/RQUpz8VLcy" alt="视觉检测项目截图">
+              <button class="gallery-nav gallery-next" id="gNext" aria-label="下一张"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+            </div>
+            <div class="gallery-caption" id="gCaption">三伤缺陷标注训练<span class="fname" id="gFname">三伤检测标注训练.png</span></div>
+            <div class="gallery-dots" id="gDots"></div>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3>工业视觉智能检测系统</h3>
+          <div class="sub">AIC 2025 全国大学生人工智能竞赛 · 国赛二等奖</div>
+          <p class="desc">工业缺陷视觉检测项目，本人负责三伤/字符/跳帽/颜色等缺陷的标注训练、人脸识别与检测页面设计。基于深度学习的视觉检测流程，覆盖目标检测、缺陷分类与标注工作流，检测准确率达 97.5%。</p>
+          <div class="skills">
+            <span class="skill-mini">深度学习</span><span class="skill-mini">目标检测</span><span class="skill-mini">数据标注</span><span class="skill-mini">Python</span><span class="skill-mini">页面设计</span>
+          </div>
+          <div class="links">
+            <a class="link-btn alt" href="#awards"><svg viewBox="0 0 24 24"><path d="M12 15a7 7 0 1 0 0-14 7 7 0 0 0 0 14z"/><path d="M8.2 13.5 7 22l5-3 5 3-1.2-8.5"/></svg>查看获奖证书</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- 作品 2：AI 粒子交互（B 站） -->
+      <article class="card reveal">
+        <div class="card-media">
+          <div class="tag-row"><span class="tag">用 AI Agent 开发</span><span class="tag aqua">B 站演示</span></div>
+          <iframe src="https://player.bilibili.com/player.html?bvid=BV1YXty6XE1g&page=1&high_quality=1&danmaku=0" allowfullscreen="true" scrolling="no" framespacing="0" border="0"></iframe>
+        </div>
+        <div class="card-body">
+          <h3>AI 粒子交互系统</h3>
+          <div class="sub">Three.js + MediaPipe Holistic · 摄像头实时人体关键点驱动粒子场</div>
+          <p class="desc">使用 AI Agent 协作开发。调用浏览器摄像头，通过 MediaPipe Holistic 实时识别人体骨架关键点，驱动 Three.js 三维粒子场随手势运动，实现"手一挥，粒子跟随"的沉浸式交互。</p>
+          <div class="skills">
+            <span class="skill-mini">Three.js</span><span class="skill-mini">MediaPipe</span><span class="skill-mini">TypeScript</span><span class="skill-mini">Vibe Coding</span>
+          </div>
+          <div class="links">
+            <a class="link-btn" href="https://github.com/AsaiShiio/particle-interactive-ai" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.1-1.1-1.4-1.1-1.4-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg>GitHub 仓库</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- 作品 3：像素闯关（B 站） -->
+      <article class="card reveal">
+        <div class="card-media">
+          <div class="tag-row"><span class="tag">用 AI Agent 开发</span><span class="tag aqua">B 站演示</span></div>
+          <iframe src="https://player.bilibili.com/player.html?bvid=BV1bwt162EBT&page=1&high_quality=1&danmaku=0" allowfullscreen="true" scrolling="no" framespacing="0" border="0"></iframe>
+        </div>
+        <div class="card-body">
+          <h3>像素闯关小游戏</h3>
+          <div class="sub">Next.js + 自研 TypeScript 游戏引擎 · 类《马里奥》横版闯关</div>
+          <p class="desc">使用 AI Agent 协作开发。从零实现像素风横版闯关：自研 TS 游戏引擎（物理、碰撞、动画状态机、关卡与音效），支持键盘/触屏操作，浏览器即开即玩。</p>
+          <div class="skills">
+            <span class="skill-mini">Next.js</span><span class="skill-mini">TypeScript</span><span class="skill-mini">游戏引擎</span><span class="skill-mini">Vibe Coding</span>
+          </div>
+          <div class="links">
+            <a class="link-btn" href="https://github.com/AsaiShiio/mario-platform-game" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.1-1.1-1.4-1.1-1.4-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg>GitHub 仓库</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- 作品 4：智能监控（B 站） -->
+      <article class="card reveal">
+        <div class="card-media">
+          <div class="tag-row"><span class="tag aqua">B 站演示</span></div>
+          <iframe src="https://player.bilibili.com/player.html?bvid=BV1VXty6XE1o&page=1&high_quality=1&danmaku=0" allowfullscreen="true" scrolling="no" framespacing="0" border="0"></iframe>
+        </div>
+        <div class="card-body">
+          <h3>智能视频监控系统</h3>
+          <div class="sub">ESP32 + 摄像头模组 · 团队项目（负责声光报警等模块）</div>
+          <p class="desc">基于 ESP32 与摄像头模组实现的本地视频监控方案，支持画面采集、存储与异常提示。团队分工协作，本人负责声光报警、界面交互与整机联调。</p>
+          <div class="skills">
+            <span class="skill-mini">ESP32</span><span class="skill-mini">C</span><span class="skill-mini">嵌入式</span><span class="skill-mini">团队项目</span>
+          </div>
+          <div class="links">
+            <a class="link-btn" href="https://github.com/AsaiShiio/smart-home-surveillance" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.1-1.1-1.4-1.1-1.4-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg>GitHub 仓库</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- 作品 5：温湿度采集（新增） -->
+      <article class="card reveal">
+        <div class="card-media" style="padding:0">
+          <div class="tag-row"><span class="tag dark">课程项目</span></div>
+          <div class="dual-img">
+            <figure>
+              <img src="https://aka.doubaocdn.com/s/jHedoS3lJ6" alt="Blinker 手机 APP 远程监控界面" loading="lazy">
+              <figcaption>Blinker APP 远程监控（温度 28.9°C / 湿度 52%）</figcaption>
+            </figure>
+            <figure>
+              <img src="https://aka.doubaocdn.com/s/aAGCqqCy0u" alt="OLED 显示屏实物" loading="lazy">
+              <figcaption>OLED 实物显示（T:28.9°C / H:50.0%）</figcaption>
+            </figure>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3>温湿度采集系统</h3>
+          <div class="sub">ESP32 + DHT11 + OLED · Blinker 物联网平台远程监控</div>
+          <p class="desc">基于 ESP32 与 DHT11 温湿度传感器，通过 OLED 屏本地实时显示温度湿度，并接入 Blinker 物联网平台，实现手机 APP 远程查看数据与设备控制。</p>
+          <div class="skills">
+            <span class="skill-mini">ESP32</span><span class="skill-mini">DHT11</span><span class="skill-mini">OLED</span><span class="skill-mini">Blinker</span><span class="skill-mini">物联网</span>
+          </div>
+          <div class="links">
+            <a class="link-btn" href="https://github.com/AsaiShiio/esp32-iot-course-lab" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.1-1.1-1.4-1.1-1.4-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg>GitHub 仓库</a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section class="awards" id="awards">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-tag">Awards</span>
+      <h2>获奖与证书</h2>
+    </div>
+
+    <div class="award-block reveal">
+      <h3>AIC 2025 全国大学生人工智能竞赛</h3>
+      <div class="award-grid">
+        <div class="award">
+          <img src="https://aka.doubaocdn.com/s/OVcLQoOF3F" alt="2025 AIC 国赛二等奖获奖证书" loading="lazy">
+          <div class="award-info"><h4>国赛二等奖</h4><p>工业视觉智能检测系统，检测准确率 97.5%</p></div>
+        </div>
+        <div class="award">
+          <img src="https://aka.doubaocdn.com/s/yyZmi2ZMoS" alt="2025 AIC 省赛一等奖获奖证书" loading="lazy">
+          <div class="award-info"><h4>省赛一等奖（赛区制）</h4><p>工业视觉智能检测系统</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="award-block reveal">
+      <h3>其他获奖经历</h3>
+      <div class="award-grid four">
+        <div class="award">
+          <img src="https://aka.doubaocdn.com/s/WcukZPAZ6W" alt="24年省三获奖证书" loading="lazy">
+          <div class="award-info"><h4>2024 省级三等奖</h4></div>
+        </div>
+        <div class="award">
+          <img src="https://aka.doubaocdn.com/s/j4N7H6Fqgo" alt="25年省二获奖证书" loading="lazy">
+          <div class="award-info"><h4>2025 省级二等奖</h4></div>
+        </div>
+        <div class="award">
+          <img src="https://aka.doubaocdn.com/s/rdlBfZSsqC" alt="26省三获奖证书" loading="lazy">
+          <div class="award-info"><h4>2026 省级三等奖</h4></div>
+        </div>
+        <div class="award">
+          <img src="https://aka.doubaocdn.com/s/gLVh5TvTey" alt="26省二获奖证书" loading="lazy">
+          <div class="award-info"><h4>2026 省级二等奖</h4></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="skills-sec" id="skills">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-tag">Skills</span>
+      <h2>技能概览</h2>
+      <p>以 AI 应用开发 / AI Agent 为主线，兼顾 Web 前端与嵌入式基础。</p>
+    </div>
+    <div class="skill-list">
+      <div class="skill-item reveal">
+        <div class="s-icon"><svg viewBox="0 0 24 24"><path d="M4 8V4h16v4"/><path d="M4 16v4h16v-4"/><path d="M12 4v16"/><path d="M4 12h16"/></svg></div>
+        <h4>Vibe Coding</h4>
+        <p>熟练使用 Cline / Codex 与 AI 协作开发，两个前端作品均由 AI Agent 辅助完成。</p>
+      </div>
+      <div class="skill-item reveal">
+        <div class="s-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M19.1 4.9l-2.8 2.8M7.7 16.3l-2.8 2.8"/></svg></div>
+        <h4>AI Agent 开发</h4>
+        <p>理解 Agent 工作流与工具调用，能基于 AI Agent 规划、实现并交付完整应用。</p>
+      </div>
+      <div class="skill-item reveal">
+        <div class="s-icon"><svg viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+        <h4>TypeScript / JavaScript</h4>
+        <p>Next.js、Three.js 前端开发，游戏引擎与粒子系统等自研实现。</p>
+      </div>
+      <div class="skill-item reveal">
+        <div class="s-icon"><svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg></div>
+        <h4>Python / 深度学习</h4>
+        <p>了解深度学习与神经网络基础（CNN、模型训练与评估流程），用于视觉检测项目。</p>
+      </div>
+      <div class="skill-item reveal">
+        <div class="s-icon"><svg viewBox="0 0 24 24"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg></div>
+        <h4>Web 前端</h4>
+        <p>响应式页面、Canvas 动画、浏览器媒体能力（摄像头/MediaPipe）集成。</p>
+      </div>
+      <div class="skill-item reveal">
+        <div class="s-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M7 21h10M12 17v4"/><path d="M7 11l2 2 4-5"/></svg></div>
+        <h4>嵌入式基础</h4>
+        <p>ESP32 / STM32 课程学习，DHT11 传感器、OLED、Blinker 云平台接入。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h3>一起做点有意思的？</h3>
+        <p class="foot-sub">正在寻找 AI 应用开发 / AI Agent / Vibe Coding 方向的实习机会，欢迎联系。</p>
+        <div class="contact-list">
+          <a class="contact-row" href="mailto:80622296@qq.com"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M4 7l8 6 8-6"/></svg>80622296@qq.com</a>
+          <a class="contact-row" href="tel:13007221185"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>130 0722 1185</a>
+          <a class="contact-row" href="https://github.com/AsaiShiio" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.1-1.1-1.4-1.1-1.4-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg>github.com/AsaiShiio</a>
+        </div>
+      </div>
+      <div>
+        <p class="foot-sub" style="margin-top:0">作品集仓库</p>
+        <div class="contact-list">
+          <a class="contact-row" href="https://github.com/AsaiShiio/particle-interactive-ai" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M7 4h10v16l-5-3-5 3V4z"/></svg>particle-interactive-ai</a>
+          <a class="contact-row" href="https://github.com/AsaiShiio/mario-platform-game" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M7 4h10v16l-5-3-5 3V4z"/></svg>mario-platform-game</a>
+          <a class="contact-row" href="https://github.com/AsaiShiio/smart-home-surveillance" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M7 4h10v16l-5-3-5 3V4z"/></svg>smart-home-surveillance</a>
+          <a class="contact-row" href="https://github.com/AsaiShiio/esp32-iot-course-lab" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M7 4h10v16l-5-3-5 3V4z"/></svg>esp32-iot-course-lab</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-note">
+      <span>夏娅文 · AI 应用开发 / AI Agent / Vibe Coding</span>
+      <span>Built with AI Agent · 2026</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ================= 音效 ================= */
+  var soundOn = true;
+  var actx = null;
+  function ensureAudio(){
+    if (!actx){ try{ actx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ return null; } }
+    if (actx.state === 'suspended'){ actx.resume(); }
+    return actx;
+  }
+  function tone(freq, dur, type, vol, when){
+    if (!soundOn) return;
+    var ctx = ensureAudio(); if (!ctx) return;
+    var t = ctx.currentTime + (when || 0);
+    var o = ctx.createOscillator(); var g = ctx.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol || 0.06, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t + dur + 0.03);
+  }
+  function sfxClick(){ tone(660, 0.09, 'triangle', 0.07); tone(990, 0.07, 'sine', 0.05, 0.03); }
+  function sfxHover(){ tone(880, 0.05, 'sine', 0.022); }
+  function sfxOpen(){ var seq=[523.25,659.25,783.99,1046.5]; seq.forEach(function(f,i){ tone(f,0.32,'sine',0.05,i*0.09); }); tone(2093,0.5,'sine',0.03,seq.length*0.09+0.05); }
+
+  var soundBtn = document.getElementById('soundBtn');
+  var soundLabel = document.getElementById('soundLabel');
+  soundBtn.addEventListener('click', function(){
+    soundOn = !soundOn;
+    soundBtn.setAttribute('aria-pressed', String(soundOn));
+    soundLabel.textContent = soundOn ? '音效开' : '音效关';
+    if (soundOn){ sfxClick(); }
+  });
+
+  /* ================= 粒子背景 ================= */
+  var canvas = document.getElementById('fx');
+  var ctx = canvas.getContext('2d');
+  var W=0,H=0,DPR=1,particles=[],mouse={x:-9999,y:-9999};
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function resize(){
+    DPR = Math.min(window.devicePixelRatio||1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = W*DPR; canvas.height = H*DPR;
+    canvas.style.width = W+'px'; canvas.style.height = H+'px';
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    initParticles();
+  }
+  function initParticles(){
+    var count = Math.min(60, Math.floor(W/24));
+    particles = [];
+    for (var i=0;i<count;i++){
+      particles.push({
+        x:Math.random()*W, y:Math.random()*H,
+        r:Math.random()*2.2+0.8,
+        vx:(Math.random()-0.5)*0.28, vy:(Math.random()-0.5)*0.28-0.12,
+        a:Math.random()*0.35+0.12,
+        c: Math.random()<0.6 ? '127,212,160' : '111,192,202'
+      });
+    }
+  }
+  function drawParticles(){
+    ctx.clearRect(0,0,W,H);
+    for (var i=0;i<particles.length;i++){
+      var p=particles[i];
+      p.x+=p.vx; p.y+=p.vy;
+      if (p.y<-10){p.y=H+10;p.x=Math.random()*W;}
+      if (p.x<-10){p.x=W+10;} if (p.x>W+10){p.x=-10;}
+      var dx=mouse.x-p.x, dy=mouse.y-p.y, d2=dx*dx+dy*dy;
+      if (d2<16000){ var d=Math.sqrt(d2)||1; p.x-=dx/d*0.6; p.y-=dy/d*0.6; }
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle='rgba('+p.c+','+p.a.toFixed(3)+')'; ctx.fill();
+    }
+    ctx.strokeStyle='rgba(127,212,160,0.10)'; ctx.lineWidth=0.7;
+    for (var j=0;j<particles.length;j++){
+      for (var k=j+1;k<particles.length;k++){
+        var a=particles[j],b=particles[k],ex=a.x-b.x,ey=a.y-b.y;
+        if (ex*ex+ey*ey<11000){ ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke(); }
+      }
+    }
+  }
+  function loop(){ drawParticles(); requestAnimationFrame(loop); }
+  window.addEventListener('mousemove',function(e){mouse.x=e.clientX;mouse.y=e.clientY;},{passive:true});
+  window.addEventListener('mouseout',function(){mouse.x=-9999;mouse.y=-9999;});
+  resize(); window.addEventListener('resize',resize);
+  if (reduced){ ctx.clearRect(0,0,W,H); } else { loop(); }
+
+  /* ================= 打字机 ================= */
+  var typeText = document.getElementById('typeText');
+  var words = ['AI 应用开发工程师','AI Agent 开发工程师','Vibe Coding 开发者','物联网工程 · 前端 · 嵌入式'];
+  var wi=0,ci=0,deleting=false;
+  function typeLoop(){
+    var word=words[wi];
+    typeText.textContent = word.slice(0,ci);
+    var delay = deleting ? 42 : 88;
+    if (!deleting && ci===word.length){ delay=1500; deleting=true; }
+    else if (deleting && ci===0){ deleting=false; wi=(wi+1)%words.length; delay=420; }
+    ci += deleting ? -1 : 1;
+    setTimeout(typeLoop, delay);
+  }
+  if (!reduced){ typeLoop(); } else { typeText.textContent = words[0]; }
+
+  /* ================= 视觉检测相册 ================= */
+  var galleryData = [
+    {src:'https://aka.doubaocdn.com/s/RQUpz8VLcy', label:'三伤缺陷标注训练', fname:'三伤检测标注训练.png'},
+    {src:'https://aka.doubaocdn.com/s/ptZbWDkx3Y', label:'字符识别标注训练', fname:'字符识别标注训练.png'},
+    {src:'https://aka.doubaocdn.com/s/EG1DuPjbv2', label:'跳帽缺陷标注训练', fname:'跳帽检测标注训练.png'},
+    {src:'https://aka.doubaocdn.com/s/W8WmTVDn8D', label:'颜色分类标注训练', fname:'颜色标注训练.png'},
+    {src:'https://aka.doubaocdn.com/s/tV9dE0Scap', label:'人脸识别页面设计', fname:'人脸识别页面设计.png'},
+    {src:'https://aka.doubaocdn.com/s/EeUWPigZb8', label:'检测流程设计', fname:'检测流程设计.png'},
+    {src:'https://aka.doubaocdn.com/s/guGl9RbcEm', label:'检测页面设计', fname:'检测页面设计.png'}
+  ];
+  var gIdx = 0;
+  var gImg = document.getElementById('gImg');
+  var gCaption = document.getElementById('gCaption');
+  var gFname = document.getElementById('gFname');
+  var gDots = document.getElementById('gDots');
+
+  function renderDots(){
+    gDots.innerHTML = '';
+    for (var i=0;i<galleryData.length;i++){
+      (function(idx){
+        var b = document.createElement('button');
+        b.setAttribute('aria-label','第 '+(idx+1)+' 张');
+        if (idx===gIdx){ b.className='active'; }
+        b.addEventListener('click',function(){ showGallery(idx); sfxClick(); });
+        gDots.appendChild(b);
+      })(i);
+    }
+  }
+  function showGallery(i){
+    gIdx = (i + galleryData.length) % galleryData.length;
+    var item = galleryData[gIdx];
+    gImg.style.opacity = '0';
+    setTimeout(function(){
+      gImg.src = item.src;
+      gImg.alt = item.label;
+      gCaption.firstChild.nodeValue = item.label;
+      gFname.textContent = item.fname;
+      gImg.style.opacity = '1';
+    }, 150);
+    var dots = gDots.querySelectorAll('button');
+    for (var d=0;d<dots.length;d++){ dots[d].className = (d===gIdx?'active':''); }
+  }
+  renderDots();
+  document.getElementById('gPrev').addEventListener('click',function(){ showGallery(gIdx-1); sfxClick(); });
+  document.getElementById('gNext').addEventListener('click',function(){ showGallery(gIdx+1); sfxClick(); });
+  document.addEventListener('keydown',function(e){
+    if (e.key === 'ArrowLeft'){ showGallery(gIdx-1); sfxClick(); }
+    else if (e.key === 'ArrowRight'){ showGallery(gIdx+1); sfxClick(); }
+  });
+
+  /* ================= 滚动渐显 ================= */
+  var reveals = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if (en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    },{threshold:0.12});
+    reveals.forEach(function(el){ io.observe(el); });
+  } else { reveals.forEach(function(el){ el.classList.add('in'); }); }
+
+  /* ================= 交互音效 ================= */
+  document.addEventListener('click',function(e){
+    var a = e.target.closest('a, .btn, .sound-btn, .gallery-nav, .gallery-dots button');
+    if (a && a !== soundBtn){ sfxClick(); }
+  });
+  document.addEventListener('mouseover',function(e){
+    if (e.target.closest('a, .btn, .chip, .skill-mini, .link-btn, .card')){ sfxHover(); }
+  });
+
+  var opened = false;
+  var onFirst = function(){
+    if (!opened){ opened = true; setTimeout(sfxOpen, 120); }
+    window.removeEventListener('pointerdown', onFirst);
+  };
+  window.addEventListener('pointerdown', onFirst);
+})();
+</script>
+</body>
+</html>
